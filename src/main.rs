@@ -1,8 +1,8 @@
 extern crate minigrep;
 
+use minigrep::*;
 use std::env;
 use std::process;
-use minigrep::*;
 
 fn main() {
     let args: Vec<_> = env::args().skip(1).collect();
