@@ -20,7 +20,7 @@ impl Config {
 }
 
 
-pub mod query {
+pub mod main {
 
   use super::*;
   use std::error::Error;
@@ -40,22 +40,34 @@ pub mod query {
     Ok(contents)
   }
 
+  fn execute (contents: &str, query: &str) -> Result<Vec<String>, Box<Error>> {
+
+    let pattern = format!("(.+({}).+)\n", query);
+    let re = RegexBuilder::new(&pattern).size_limit(REGEX_SIZE_LIMIT).build()?;
+
+    let res: Vec<String> = re.captures_iter(&contents)
+      .map(|caps| {
+        let outer = caps.get(1).unwrap().as_str();
+        let inner = caps.get(2).unwrap().as_str();
+        format!("{}", outer.replace(&inner, &format!("{}", &inner.red())))
+      })
+      .collect();
+
+    Ok(res)
+  }
+
   pub fn run(config: Config) -> Result<(), Box<Error>>{
 
     println!("Querying '{}'\nwith '{}'\n", config.filename, config.query);
 
     let contents = read_file(&config.filename)?;
-    let pattern = format!("(.+({}).+)\n", &config.query);
-    let re = RegexBuilder::new(&pattern).size_limit(REGEX_SIZE_LIMIT).build()?;
+    let lines = execute(&contents, &config.query)?;
 
-    for caps in re.captures_iter(&contents) {
-      let outer = caps.get(1).unwrap().as_str();
-      let inner = caps.get(2).unwrap().as_str();
-      println!("{}", outer.replace(&inner, &format!("{}", &inner.red())));
+    for l in lines {
+      println!("{}", l);
     }
 
     Ok(())
-
   }
 
 }
