@@ -29,7 +29,7 @@ pub mod main {
   use regex::RegexBuilder;
   use colored::*;
 
-  static REGEX_SIZE_LIMIT: usize = 1_000_000;
+  static REGEX_SIZE_LIMIT: usize = 1_000_000; // Bytes
 
 
   fn read_file(filename: &str) -> Result<String, Box<Error>> {
@@ -40,7 +40,7 @@ pub mod main {
     Ok(contents)
   }
 
-  fn execute (contents: &str, query: &str) -> Result<Vec<String>, Box<Error>> {
+  pub fn execute (contents: &str, query: &str) -> Result<Vec<String>, Box<Error>> {
 
     let pattern = format!("(.+({}).+)\n", query);
     let re = RegexBuilder::new(&pattern).size_limit(REGEX_SIZE_LIMIT).build()?;
@@ -72,3 +72,6 @@ pub mod main {
 
 }
 
+
+#[cfg(test)]
+mod tests;
